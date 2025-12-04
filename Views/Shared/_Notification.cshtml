@@ -1,0 +1,137 @@
+<!-- Views/Shared/_Notification.cshtml -->
+
+<!-- 1. COMPONENT PLACEHOLDER -->
+<notification-toast></notification-toast>
+
+<!-- 2. COMPONENT TEMPLATE -->
+<script type="text/x-template" id="notification-template">
+    <transition name="slide-fade">
+        <div v-if="visible" 
+             class="fixed top-24 right-5 z-[9999] max-w-sm w-full bg-white shadow-xl rounded-xl pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden transform transition-all duration-300 ease-in-out border-l-4"
+             :class="typeClass">
+            <div class="p-4">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 pt-0.5">
+                        <i v-if="type === 'success'" class="ph-fill ph-check-circle text-green-500 text-2xl drop-shadow-sm"></i>
+                        <i v-else-if="type === 'error'" class="ph-fill ph-x-circle text-red-500 text-2xl drop-shadow-sm"></i>
+                        <i v-else-if="type === 'warning'" class="ph-fill ph-warning text-yellow-500 text-2xl drop-shadow-sm"></i>
+                        <i v-else class="ph-fill ph-info text-blue-500 text-2xl drop-shadow-sm"></i>
+                    </div>
+                    <div class="ml-3 w-0 flex-1">
+                        <p class="text-sm font-bold text-gray-900 leading-5">{{ title }}</p>
+                        <p class="mt-1 text-sm text-gray-600 leading-snug">{{ message }}</p>
+                    </div>
+                    <div class="ml-4 flex-shrink-0 flex">
+                        <button v-on:click="visible = false" class="bg-transparent rounded-md inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors">
+                            <span class="sr-only">Close</span>
+                            <i class="ph-bold ph-x text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Progress Bar -->
+            <div v-if="autoClose" class="h-1 w-full bg-gray-100">
+                <div class="h-full transition-all ease-linear" 
+                     :class="progressColor" 
+                     :style="{ width: progressWidth + '%', transitionDuration: '3000ms' }"></div>
+            </div>
+        </div>
+    </transition>
+</script>
+
+<style>
+    /* Smooth Slide & Fade Animation */
+    .slide-fade-enter-active {
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Ease Out Expo */
+    }
+    .slide-fade-leave-active {
+        transition: all 0.3s cubic-bezier(0.7, 0, 0.84, 0); /* Ease In Expo */
+    }
+    .slide-fade-enter-from,
+    .slide-fade-leave-to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+</style>
+
+<script>
+    if (window.vueApp) {
+        window.vueApp.component('notification-toast', {
+            template: '#notification-template',
+            setup() {
+                const { ref, computed } = Vue;
+                
+                const visible = ref(false);
+                const title = ref('');
+                const message = ref('');
+                const type = ref('info'); 
+                const autoClose = ref(true);
+                const progressWidth = ref(100);
+                let timer = null;
+
+                window.showNotification = (msg, notifType = 'info', notifTitle = '') => {
+                    message.value = msg;
+                    type.value = notifType;
+                    
+                    if (!notifTitle) {
+                        switch(notifType) {
+                            case 'success': title.value = 'Thành công!'; break;
+                            case 'error': title.value = 'Đã xảy ra lỗi!'; break;
+                            case 'warning': title.value = 'Chú ý!'; break;
+                            default: title.value = 'Thông báo';
+                        }
+                    } else {
+                        title.value = notifTitle;
+                    }
+
+                    // Reset animation
+                    visible.value = false;
+                    setTimeout(() => {
+                        visible.value = true;
+                        progressWidth.value = 100;
+
+                        if (timer) clearTimeout(timer);
+
+                        if (autoClose.value) {
+                            // Start progress bar shrink
+                            setTimeout(() => { progressWidth.value = 0; }, 50);
+                            
+                            timer = setTimeout(() => {
+                                visible.value = false;
+                            }, 3000);
+                        }
+                    }, 100);
+                };
+
+                const typeClass = computed(() => {
+                    switch (type.value) {
+                        case 'success': return 'border-green-500';
+                        case 'error': return 'border-red-500';
+                        case 'warning': return 'border-yellow-500';
+                        default: return 'border-blue-500';
+                    }
+                });
+
+                const progressColor = computed(() => {
+                    switch (type.value) {
+                        case 'success': return 'bg-green-500';
+                        case 'error': return 'bg-red-500';
+                        case 'warning': return 'bg-yellow-500';
+                        default: return 'bg-blue-500';
+                    }
+                });
+
+                return {
+                    visible,
+                    title,
+                    message,
+                    type,
+                    autoClose,
+                    progressWidth,
+                    typeClass,
+                    progressColor
+                };
+            }
+        });
+    }
+</script>

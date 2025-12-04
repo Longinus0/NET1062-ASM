@@ -1,0 +1,26 @@
+.register-bg {
+    background-color: #f3f4f6;
+    background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.floating-input {
+    transition: all 0.2s ease;
+}
+
+.floating-input:focus ~ label,
+.floating-input:not(:placeholder-shown) ~ label {
+    transform: translateY(-1.5rem) scale(0.85);
+    color: #f97316; /* orange-500 */
+}
+
+.error-msg-enter-active,
+.error-msg-leave-active {
+    transition: all 0.3s ease;
+}
+
+.error-msg-enter-from,
+.error-msg-leave-to {
+    opacity: 0;
+    transform: translateY(-5px);
+}

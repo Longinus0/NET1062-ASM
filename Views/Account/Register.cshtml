@@ -1,0 +1,194 @@
+@using ASM.Models
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+<style>
+    .register-bg {
+        background-color: #f3f4f6;
+        background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+    .floating-input:focus ~ label,
+    .floating-input:not(:placeholder-shown) ~ label,
+    .floating-select:focus ~ label,
+    .floating-select:not([value=""]) ~ label {
+        transform: translateY(-1.5rem) scale(0.85);
+        color: #f97316;
+    }
+</style>
+
+<register-page></register-page>
+
+@section Templates {
+    <script type="text/x-template" id="register-template">
+        <div class="register-bg min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-5xl w-full space-y-8 bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+                
+                <!-- Left Side -->
+                <div class="hidden md:flex md:w-5/12 bg-orange-600 relative flex-col justify-center items-center text-white p-10">
+                    <div class="absolute inset-0 bg-orange-900 opacity-20"></div>
+                    <div class="relative z-10 text-center">
+                        <i class="ph-fill ph-hamburger text-8xl mb-4"></i>
+                        <h2 class="text-4xl font-extrabold mb-2">FastFood</h2>
+                        <p class="text-orange-100 text-lg">Đăng ký thành viên để nhận ưu đãi.</p>
+                    </div>
+                </div>
+
+                <!-- Right Side -->
+                <div class="md:w-7/12 p-8 sm:p-12 relative">
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-extrabold text-gray-900">Đăng ký tài khoản</h2>
+                        <p class="mt-2 text-sm text-gray-600">Vui lòng điền thông tin chi tiết.</p>
+                    </div>
+
+                    <form class="space-y-4" v-on:submit.prevent="handleSubmit">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="relative">
+                                <input v-model="form.lastName" type="text" id="lastName" class="floating-input block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-300 focus:border-orange-600 focus:ring-0 peer" placeholder=" " />
+                                <label for="lastName" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Họ *</label>
+                                <span v-if="errors.lastName" class="text-red-500 text-xs mt-1">{{ errors.lastName }}</span>
+                            </div>
+                            <div class="relative">
+                                <input v-model="form.firstName" type="text" id="firstName" class="floating-input block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-300 focus:border-orange-600 focus:ring-0 peer" placeholder=" " />
+                                <label for="firstName" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Tên *</label>
+                                <span v-if="errors.firstName" class="text-red-500 text-xs mt-1">{{ errors.firstName }}</span>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                             <select v-model="form.gender" id="gender" class="floating-select block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-300 focus:border-orange-600 focus:ring-0 appearance-none" :class="form.gender ? 'text-gray-900' : 'text-gray-500'">
+                                <option value="" disabled selected hidden></option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nu">Nữ</option>
+                                <option value="Khac">Khác</option>
+                            </select>
+                            <label for="gender" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2" :class="form.gender ? '-translate-y-4 scale-75 top-2' : 'top-1/2 -translate-y-1/2 scale-100'">Giới tính *</label>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none"><i class="ph-bold ph-caret-down text-gray-400"></i></div>
+                            <span v-if="errors.gender" class="text-red-500 text-xs mt-1">{{ errors.gender }}</span>
+                        </div>
+
+                        <div class="relative">
+                            <input v-model="form.phone" type="tel" id="phone" class="floating-input block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-300 focus:border-orange-600 focus:ring-0 peer" placeholder=" " />
+                            <label for="phone" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">SĐT *</label>
+                            <span v-if="errors.phone" class="text-red-500 text-xs mt-1">{{ errors.phone }}</span>
+                        </div>
+
+                        <div class="relative">
+                            <input v-model="form.email" type="email" id="email" class="floating-input block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-300 focus:border-orange-600 focus:ring-0 peer" placeholder=" " />
+                            <label for="email" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Email *</label>
+                            <span v-if="errors.email" class="text-red-500 text-xs mt-1">{{ errors.email }}</span>
+                        </div>
+
+                        <div class="relative">
+                            <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="password" class="floating-input block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-300 focus:border-orange-600 focus:ring-0 peer" placeholder=" " />
+                            <label for="password" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Mật khẩu *</label>
+                            <button type="button" class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-orange-600" v-on:click="showPassword = !showPassword"><i class="ph-bold" :class="showPassword ? 'ph-eye-slash' : 'ph-eye'"></i></button>
+                            <span v-if="errors.password" class="text-red-500 text-xs mt-1">{{ errors.password }}</span>
+                        </div>
+                        
+                        <div class="relative">
+                            <input v-model="form.confirmPassword" :type="showPassword ? 'text' : 'password'" id="confirmPassword" class="floating-input block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-300 focus:border-orange-600 focus:ring-0 peer" placeholder=" " />
+                            <label for="confirmPassword" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Xác nhận MK *</label>
+                            <span v-if="errors.confirmPassword" class="text-red-500 text-xs mt-1">{{ errors.confirmPassword }}</span>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" :disabled="isLoading" class="w-full py-3 px-4 rounded-lg text-white bg-orange-600 hover:bg-orange-700 font-bold transition-all shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center">
+                                <i v-if="isLoading" class="ph-bold ph-spinner animate-spin mr-2"></i>
+                                {{ isLoading ? 'Đang xử lý...' : 'Đăng ký ngay' }}
+                            </button>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <p class="text-sm text-gray-600">Đã có tài khoản? <a href="/Account/Login" class="text-orange-600 font-bold hover:underline">Đăng nhập</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </script>
+}
+
+@section Scripts {
+    <script>
+        if (window.vueApp) {
+            window.vueApp.component('register-page', {
+                template: '#register-template',
+                setup() {
+                    const { ref, reactive } = Vue;
+                    const isLoading = ref(false);
+                    const showPassword = ref(false);
+                    
+                    const form = reactive({
+                        firstName: '', lastName: '', gender: '',
+                        phone: '', email: '', password: '', confirmPassword: ''
+                    });
+
+                    const errors = reactive({});
+
+                    const validate = () => {
+                        Object.keys(errors).forEach(key => delete errors[key]);
+                        let isValid = true;
+                        
+                        if (!form.firstName) { errors.firstName = 'Vui lòng nhập tên'; isValid = false; }
+                        if (!form.lastName) { errors.lastName = 'Vui lòng nhập họ'; isValid = false; }
+                        if (!form.gender) { errors.gender = 'Vui lòng chọn giới tính'; isValid = false; }
+                        
+                        const phoneRegex = new RegExp("^\\d{10,11}$");
+                        if (!form.phone) { errors.phone = 'Vui lòng nhập SĐT'; isValid = false; } 
+                        else if (!phoneRegex.test(form.phone)) { errors.phone = 'SĐT không hợp lệ'; isValid = false; }
+
+                        if (!form.email) { errors.email = 'Vui lòng nhập email'; isValid = false; } 
+                        else if (!form.email.includes("@@") || !form.email.includes(".")) { errors.email = 'Email không hợp lệ'; isValid = false; }
+
+                        if (!form.password) { errors.password = 'Vui lòng nhập mật khẩu'; isValid = false; }
+                        else if (form.password.length < 6) { errors.password = 'Mật khẩu tối thiểu 6 ký tự'; isValid = false; }
+                        
+                        if (form.password !== form.confirmPassword) { errors.confirmPassword = 'Mật khẩu không khớp'; isValid = false; }
+                        
+                        return isValid;
+                    };
+
+                    const handleSubmit = async () => {
+                        if (!validate()) return;
+                        isLoading.value = true;
+                        
+                        try {
+                            const response = await fetch('/Account/Register', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(form)
+                            });
+
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            
+                            const data = await response.json();
+
+                            if (data.success) {
+                                if(window.showNotification) 
+                                    window.showNotification(data.message, "success");
+                                
+                                setTimeout(() => {
+                                    window.location.href = '/Account/Login';
+                                }, 1500);
+                            } else {
+                                if(window.showNotification) 
+                                    window.showNotification(data.message, "error");
+                            }
+                        } catch (error) {
+                            if(window.showNotification) 
+                                window.showNotification("Lỗi kết nối server.", "error");
+                            console.error(error);
+                        } finally {
+                            isLoading.value = false;
+                        }
+                    };
+
+                    return { form, errors, isLoading, showPassword, handleSubmit };
+                }
+            });
+        }
+    </script>
+}

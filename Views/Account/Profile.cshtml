@@ -1,0 +1,162 @@
+@using ASM.Models
+@model User
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Views/Account/Profile.cshtml.css" />
+}
+
+<profile-page></profile-page>
+
+@section Templates {
+    <script type="text/x-template" id="profile-template">
+        <div class="profile-bg pb-12">
+            <!-- Header Banner -->
+            <div class="profile-header"></div>
+
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Profile Summary Card -->
+                <div class="relative flex flex-col items-center mb-8">
+                    <div class="avatar-wrapper">
+                        <img :src="form.avatar || 'https://ui-avatars.com/api/?name=' + (form.firstName || 'User') + '&background=f97316&color=fff'" alt="Avatar" class="avatar-img">
+                    </div>
+                    <h1 class="mt-4 text-2xl font-bold text-gray-900">{{ form.lastName }} {{ form.firstName }}</h1>
+                    <p class="text-gray-500">{{ form.email }}</p>
+                </div>
+
+                <!-- Main Form -->
+                <div class="form-card">
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900">Thông tin cá nhân</h3>
+                        <span class="text-xs text-gray-500">Thành viên từ: {{ formatDate(form.createdAt) }}</span>
+                    </div>
+                    
+                    <div class="p-6 md:p-8">
+                        <form v-on:submit.prevent="saveProfile">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- Last Name -->
+                                <div>
+                                    <label class="form-label">Họ</label>
+                                    <input v-model="form.lastName" type="text" class="form-input" placeholder="Nhập họ">
+                                </div>
+                                <!-- First Name -->
+                                <div>
+                                    <label class="form-label">Tên</label>
+                                    <input v-model="form.firstName" type="text" class="form-input" placeholder="Nhập tên">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- Phone -->
+                                <div>
+                                    <label class="form-label">Số điện thoại</label>
+                                    <input v-model="form.phone" type="tel" class="form-input" placeholder="09xxxxxxx">
+                                </div>
+                                <!-- Gender -->
+                                <div>
+                                    <label class="form-label">Giới tính</label>
+                                    <select v-model="form.gender" class="form-select">
+                                        <option value="">Chọn giới tính</option>
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nu">Nữ</option>
+                                        <option value="Khac">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Email (Read-only usually) -->
+                            <div class="mb-8">
+                                <label class="form-label">Email</label>
+                                <input v-model="form.email" type="email" class="form-input bg-gray-50 text-gray-500 cursor-not-allowed" readonly>
+                                <p class="mt-1 text-xs text-gray-400">Email không thể thay đổi.</p>
+                            </div>
+
+                            <div class="flex justify-end pt-4 border-t border-gray-100">
+                                <button type="submit" :disabled="isLoading" class="btn-save flex items-center">
+                                    <i v-if="isLoading" class="ph-bold ph-spinner animate-spin mr-2"></i>
+                                    {{ isLoading ? 'Đang lưu...' : 'Lưu thay đổi' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+}
+
+@section Scripts {
+    <script>
+        const serverUser = @Html.Raw(Json.Serialize(Model));
+
+        if (window.vueApp) {
+            window.vueApp.component('profile-page', {
+                template: '#profile-template',
+                setup() {
+                    const { ref, reactive } = Vue;
+                    const isLoading = ref(false);
+                    
+                    const form = reactive({
+                        userId: serverUser?.userId || 0,
+                        firstName: serverUser?.firstName || '',
+                        lastName: serverUser?.lastName || '',
+                        email: serverUser?.email || '',
+                        phone: serverUser?.phone || '',
+                        gender: serverUser?.gender || '',
+                        avatar: serverUser?.avatar || '',
+                        createdAt: serverUser?.createdAt
+                    });
+
+                    const formatDate = (dateString) => {
+                        if (!dateString) return '';
+                        return new Date(dateString).toLocaleDateString('vi-VN');
+                    };
+
+                    const saveProfile = async () => {
+                        // Basic Validation
+                        if (!form.firstName || !form.lastName || !form.phone) {
+                            if(window.showNotification) 
+                                window.showNotification("Vui lòng nhập đầy đủ thông tin bắt buộc", "warning");
+                            return;
+                        }
+
+                        isLoading.value = true;
+
+                        try {
+                            const response = await fetch('/Account/UpdateProfile', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(form)
+                            });
+
+                            const data = await response.json();
+
+                            if (data.success) {
+                                if(window.showNotification) 
+                                    window.showNotification("Cập nhật thông tin thành công!", "success");
+                            } else {
+                                if(window.showNotification) 
+                                    window.showNotification(data.message || "Có lỗi xảy ra", "error");
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            if(window.showNotification) 
+                                window.showNotification("Lỗi kết nối server", "error");
+                        } finally {
+                            isLoading.value = false;
+                        }
+                    };
+
+                    return {
+                        form,
+                        isLoading,
+                        formatDate,
+                        saveProfile
+                    };
+                }
+            });
+        }
+    </script>
+}

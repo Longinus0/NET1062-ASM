@@ -15,13 +15,20 @@ namespace ASM.Data
         public DbSet<Order> Orders { get; set; } = null!;
         public DbSet<OrderDetail> OrderDetails { get; set; } = null!;
         public DbSet<Address> Addresses { get; set; } = null!;
+        public DbSet<Payment> Payments { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<ComboDetail>()
                 .HasKey(cd => new { cd.ComboId, cd.ProductId });
 
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.DefaultAddress)
+                .WithMany()
+                .HasForeignKey(u => u.DefaultAddressId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

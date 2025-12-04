@@ -1,0 +1,159 @@
+@using ASM.Models
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Views/Account/Login.cshtml.css" />
+}
+
+<login-page></login-page>
+
+@section Templates {
+    <script type="text/x-template" id="login-template">
+        <div class="login-bg min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+                
+                <!-- Left Side -->
+                <div class="hidden md:flex md:w-5/12 bg-orange-600 relative flex-col justify-center items-center text-white p-10">
+                    <div class="absolute inset-0 bg-orange-900 opacity-20"></div>
+                    <img src="https://images.unsplash.com/photo-1561758033-d89a9ad46330?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80" 
+                         class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40" 
+                         alt="Food Pattern">
+                    <div class="relative z-10 text-center">
+                        <i class="ph-fill ph-hamburger text-8xl mb-4"></i>
+                        <h2 class="text-4xl font-extrabold mb-2">FastFood</h2>
+                        <p class="text-orange-100 text-lg">Chào mừng bạn quay trở lại!</p>
+                    </div>
+                </div>
+
+                <!-- Right Side -->
+                <div class="md:w-7/12 p-8 sm:p-12 relative">
+                    <div class="text-center md:text-left mb-8">
+                        <h2 class="text-3xl font-extrabold text-gray-900">Đăng nhập</h2>
+                        <p class="mt-2 text-sm text-gray-600">
+                            Chưa có tài khoản? 
+                            <a href="/Account/Register" class="font-medium text-orange-600 hover:text-orange-500 hover:underline">Đăng ký ngay</a>
+                        </p>
+                    </div>
+
+                    <form class="space-y-6" v-on:submit.prevent="handleLogin">
+                        
+                        <!-- REMOVED: Local error banner div. We use global notification now. -->
+
+                        <div class="relative">
+                            <input v-model="form.identifier" type="text" id="identifier" class="floating-input block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-0 peer" placeholder=" " />
+                            <label for="identifier" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Email hoặc SĐT</label>
+                            <span v-if="errors.identifier" class="text-red-500 text-xs mt-1">{{ errors.identifier }}</span>
+                        </div>
+
+                        <div class="relative">
+                            <input v-model="form.password" :type="showPassword ? 'text' : 'password'" id="password" class="floating-input block px-4 py-3 w-full bg-transparent rounded-lg border border-gray-200 focus:border-orange-500 focus:ring-0 peer" placeholder=" " />
+                            <label for="password" class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-placeholder-shown:scale-100 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-2">Mật khẩu</label>
+                            <button type="button" class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-orange-600" v-on:click="showPassword = !showPassword">
+                                <i class="ph-bold" :class="showPassword ? 'ph-eye-slash' : 'ph-eye'"></i>
+                            </button>
+                            <span v-if="errors.password" class="text-red-500 text-xs mt-1">{{ errors.password }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input v-model="form.rememberMe" id="remember-me" type="checkbox" class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
+                                <label for="remember-me" class="ml-2 block text-sm text-gray-900">Ghi nhớ đăng nhập</label>
+                            </div>
+                            <div class="text-sm">
+                                <a href="#" class="font-medium text-orange-600 hover:text-orange-500">Quên mật khẩu?</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="submit" :disabled="isLoading" class="btn-primary w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-70 disabled:cursor-not-allowed">
+                                <i v-if="isLoading" class="ph-bold ph-spinner animate-spin mr-2 text-lg"></i>
+                                {{ isLoading ? 'Đang xử lý...' : 'Đăng nhập' }}
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Social Login -->
+                    <div class="mt-8">
+                        <div class="relative">
+                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div>
+                            <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-500">Hoặc tiếp tục với</span></div>
+                        </div>
+
+                        <div class="mt-6 grid grid-cols-2 gap-3">
+                            <a href="/Account/GoogleLogin" class="w-full inline-flex justify-center py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors">
+                                <i class="ph-bold ph-google-logo text-red-500 text-xl mr-2"></i> Google
+                            </a>
+                            <a href="/Account/FacebookLogin" class="w-full inline-flex justify-center py-2.5 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors">
+                                <i class="ph-bold ph-facebook-logo text-blue-600 text-xl mr-2"></i> Facebook
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+}
+
+@section Scripts {
+    <script>
+        if (window.vueApp) {
+            window.vueApp.component('login-page', {
+                template: '#login-template',
+                setup() {
+                    const { ref, reactive } = Vue;
+                    const isLoading = ref(false);
+                    const showPassword = ref(false);
+                    
+                    const form = reactive({ identifier: '', password: '', rememberMe: false });
+                    const errors = reactive({});
+
+                    const validate = () => {
+                        Object.keys(errors).forEach(key => delete errors[key]);
+                        let isValid = true;
+                        if (!form.identifier) { errors.identifier = 'Vui lòng nhập thông tin'; isValid = false; }
+                        if (!form.password) { errors.password = 'Vui lòng nhập mật khẩu'; isValid = false; }
+                        return isValid;
+                    };
+
+                    const handleLogin = async () => {
+                        if (!validate()) return;
+                        isLoading.value = true;
+
+                        try {
+                            const response = await fetch('/Account/Login', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(form)
+                            });
+
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            
+                            const data = await response.json();
+
+                            if (data.success) {
+                                // Use global notification
+                                if(window.showNotification) window.showNotification("Đăng nhập thành công!", "success");
+                                
+                                setTimeout(() => {
+                                    window.location.href = data.role === 'admin' ? '/Admin/Dashboard' : '/';
+                                }, 1000);
+                            } else {
+                                // Use global notification for error
+                                if(window.showNotification) window.showNotification(data.message, "error");
+                            }
+                        } catch (error) {
+                            if(window.showNotification) window.showNotification("Lỗi kết nối server.", "error");
+                            console.error(error);
+                        } finally {
+                            isLoading.value = false;
+                        }
+                    };
+
+                    return { form, errors, isLoading, showPassword, handleLogin };
+                }
+            });
+        }
+    </script>
+}

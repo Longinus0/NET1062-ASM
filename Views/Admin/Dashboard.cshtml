@@ -1,0 +1,199 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Views/Admin/Dashboard.cshtml.css" />
+}
+
+<admin-dashboard></admin-dashboard>
+
+@section Templates {
+    <script type="text/x-template" id="admin-dashboard-template">
+        <div class="admin-bg flex">
+            
+            <div class="w-64 bg-white shadow-md min-h-screen hidden lg:block fixed left-0 top-16 bottom-0 overflow-y-auto z-10">
+                <div class="p-6">
+                    <h2 class="text-xs uppercase text-gray-400 font-bold tracking-wider mb-4">Quản lý</h2>
+                    <nav class="space-y-1">
+                        <a href="/Admin/Dashboard" class="sidebar-link active flex items-center px-4 py-3 text-gray-600 rounded-lg font-medium">
+                            <i class="ph-bold ph-squares-four text-xl mr-3"></i> Dashboard
+                        </a>
+                        <a href="/Admin/Orders" class="sidebar-link flex items-center px-4 py-3 text-gray-600 rounded-lg font-medium">
+                            <i class="ph-bold ph-shopping-cart text-xl mr-3"></i> Đơn hàng
+                        </a>
+                        <a href="/Admin/Food" class="sidebar-link flex items-center px-4 py-3 text-gray-600 rounded-lg font-medium">
+                            <i class="ph-bold ph-hamburger text-xl mr-3"></i> Món ăn
+                        </a>
+                        <a href="/Admin/Combos" class="sidebar-link flex items-center px-4 py-3 text-gray-600 rounded-lg font-medium">
+                            <i class="ph-bold ph-package text-xl mr-3"></i> Combo
+                        </a>
+                        <a href="/Admin/Users" class="sidebar-link flex items-center px-4 py-3 text-gray-600 rounded-lg font-medium">
+                            <i class="ph-bold ph-users text-xl mr-3"></i> Người dùng
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="flex-1 lg:ml-64 p-8">
+                <div class="mb-8 flex justify-between items-end">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Tổng quan</h1>
+                        <p class="text-gray-500 mt-1">Chào mừng trở lại, Admin!</p>
+                    </div>
+                    <button class="bg-orange-600 text-white px-4 py-2 rounded-lg shadow hover:bg-orange-700 transition flex items-center">
+                        <i class="ph-bold ph-download-simple mr-2"></i> Xuất báo cáo
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 text-sm font-medium">Doanh thu</h3>
+                            <div class="p-2 bg-green-100 rounded-lg text-green-600">
+                                <i class="ph-bold ph-currency-dollar text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="text-2xl font-bold text-gray-900">{{ formatPrice(stats.totalRevenue) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 text-sm font-medium">Đơn hàng</h3>
+                            <div class="p-2 bg-blue-100 rounded-lg text-blue-600">
+                                <i class="ph-bold ph-shopping-bag text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="text-2xl font-bold text-gray-900">{{ stats.totalOrders }}</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 text-sm font-medium">Chờ xử lý</h3>
+                            <div class="p-2 bg-orange-100 rounded-lg text-orange-600">
+                                <i class="ph-bold ph-clock text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="text-2xl font-bold text-gray-900">{{ stats.pendingOrders }}</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 text-sm font-medium">Khách hàng</h3>
+                            <div class="p-2 bg-purple-100 rounded-lg text-purple-600">
+                                <i class="ph-bold ph-users text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="text-2xl font-bold text-gray-900">{{ stats.totalUsers }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-900">Đơn hàng gần đây</h3>
+                        <a href="/Admin/Orders" class="text-orange-600 text-sm font-medium hover:underline">Xem tất cả</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-500 font-medium">
+                                <tr>
+                                    <th class="px-6 py-3">Mã đơn</th>
+                                    <th class="px-6 py-3">Khách hàng</th>
+                                    <th class="px-6 py-3">Ngày đặt</th>
+                                    <th class="px-6 py-3">Tổng tiền</th>
+                                    <th class="px-6 py-3">Trạng thái</th>
+                                    <th class="px-6 py-3 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr v-for="order in stats.recentOrders" :key="order.orderId" class="table-row-hover">
+                                    <td class="px-6 py-4 font-medium">#{{ order.orderId }}</td>
+                                    <td class="px-6 py-4">{{ order.userName }}</td>
+                                    <td class="px-6 py-4">{{ formatDate(order.createdAt) }}</td>
+                                    <td class="px-6 py-4 font-bold">{{ formatPrice(order.totalAmount) }}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 rounded-full text-xs font-bold uppercase"
+                                              :class="getStatusClass(order.status)">
+                                            {{ getStatusText(order.status) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button class="text-gray-400 hover:text-orange-600">
+                                            <i class="ph-bold ph-eye text-lg"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+}
+
+@section Scripts {
+    <script>
+        const serverStats = @Html.Raw(Json.Serialize(ViewBag.Stats));
+
+        if (window.vueApp) {
+            window.vueApp.component('admin-dashboard', {
+                template: '#admin-dashboard-template',
+                setup() {
+                    const { ref } = Vue;
+                    const stats = ref(serverStats);
+
+                    const formatPrice = (price) => {
+                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+                    };
+
+                    const formatDate = (dateString) => {
+                        if (!dateString) return '';
+                        const date = new Date(dateString);
+                        return date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                    };
+
+                    const getStatusClass = (status) => {
+                        switch(status) {
+                            case 'pending': return 'bg-yellow-100 text-yellow-700';
+                            case 'confirmed': return 'bg-blue-100 text-blue-700';
+                            case 'preparing': return 'bg-purple-100 text-purple-700';
+                            case 'delivering': return 'bg-indigo-100 text-indigo-700';
+                            case 'delivered': return 'bg-green-100 text-green-700';
+                            case 'cancelled': return 'bg-red-100 text-red-700';
+                            default: return 'bg-gray-100 text-gray-700';
+                        }
+                    };
+
+                    const getStatusText = (status) => {
+                        switch(status) {
+                            case 'pending': return 'Chờ xử lý';
+                            case 'confirmed': return 'Đã xác nhận';
+                            case 'preparing': return 'Đang chuẩn bị';
+                            case 'delivering': return 'Đang giao';
+                            case 'delivered': return 'Hoàn tất';
+                            case 'cancelled': return 'Đã hủy';
+                            default: return status;
+                        }
+                    };
+
+                    return {
+                        stats,
+                        formatPrice,
+                        formatDate,
+                        getStatusClass,
+                        getStatusText
+                    };
+                }
+            });
+        }
+    </script>
+}
