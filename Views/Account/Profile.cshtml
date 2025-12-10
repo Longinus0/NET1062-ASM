@@ -1,86 +1,122 @@
 @using ASM.Models
-@model User
+@model dynamic
 @{
     ViewData["Title"] = "Hồ sơ cá nhân";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/Views/Account/Profile.cshtml.css" />
+    <style>
+        .profile-bg { background-color: #f9fafb; min-height: 100vh; padding-bottom: 3rem; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        .profile-banner { height: 160px; background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); width: 100%; position: relative; }
+        .profile-content-container { max-width: 1000px; margin: -40px auto 0; padding: 0 2rem; position: relative; z-index: 10; }
+        .profile-card { background-color: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); padding: 2rem; margin-bottom: 2rem; }
+        .header-info-row { display: flex; align-items: flex-end; gap: 1.5rem; margin-bottom: 2rem; margin-top: -5rem; }
+        .avatar-wrapper { width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; overflow: hidden; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .avatar-img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-initials { width: 100%; height: 100%; background-color: #f97316; color: white; font-size: 2.5rem; font-weight: 600; display: flex; align-items: center; justify-content: center; text-transform: uppercase; }
+        .user-info { padding-bottom: 0.5rem; flex: 1; }
+        .user-name { font-size: 1.5rem; font-weight: 700; color: #111827; line-height: 1.2; }
+        .user-email-label { font-size: 0.9rem; color: #6b7280; }
+        .btn-edit { background-color: #ea580c; color: white; font-weight: 500; padding: 0.5rem 1.5rem; border-radius: 0.5rem; font-size: 0.9rem; transition: background-color 0.2s; border: none; cursor: pointer; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3); }
+        .btn-edit:hover { background-color: #c2410c; }
+        .btn-edit:disabled { opacity: 0.7; cursor: not-allowed; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        @@media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .header-info-row { flex-direction: column; align-items: center; text-align: center; margin-top: -60px; } .user-info { padding-bottom: 1rem; } }
+        .form-group { display: flex; flex-direction: column; }
+        .form-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; }
+        .form-input { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 0.95rem; color: #1f2937; transition: all 0.2s; }
+        .form-input:focus { outline: none; background-color: white; border-color: #f97316; box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1); }
+        .form-input[readonly] { background-color: #f3f4f6; color: #6b7280; cursor: not-allowed; }
+        .email-section-title { font-size: 1rem; font-weight: 700; color: #111827; margin-bottom: 1rem; }
+        .email-card { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
+        .email-icon { width: 40px; height: 40px; background-color: #fff7ed; color: #ea580c; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .email-info { display: flex; flex-direction: column; }
+        .email-text { font-size: 0.95rem; font-weight: 500; color: #1f2937; }
+        .email-meta { font-size: 0.8rem; color: #9ca3af; }
+    </style>
 }
 
 <profile-page></profile-page>
 
 @section Templates {
     <script type="text/x-template" id="profile-template">
-        <div class="profile-bg pb-12">
-            <!-- Header Banner -->
-            <div class="profile-header"></div>
-
-            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Profile Summary Card -->
-                <div class="relative flex flex-col items-center mb-8">
-                    <div class="avatar-wrapper">
-                        <img :src="form.avatar || 'https://ui-avatars.com/api/?name=' + (form.firstName || 'User') + '&background=f97316&color=fff'" alt="Avatar" class="avatar-img">
-                    </div>
-                    <h1 class="mt-4 text-2xl font-bold text-gray-900">{{ form.lastName }} {{ form.firstName }}</h1>
-                    <p class="text-gray-500">{{ form.email }}</p>
-                </div>
-
-                <!-- Main Form -->
-                <div class="form-card">
-                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                        <h3 class="text-lg font-medium text-gray-900">Thông tin cá nhân</h3>
-                        <span class="text-xs text-gray-500">Thành viên từ: {{ formatDate(form.createdAt) }}</span>
-                    </div>
+        <div class="profile-bg">
+            <div class="profile-banner"></div>
+            <div class="profile-content-container">
+                <div class="profile-card">
                     
-                    <div class="p-6 md:p-8">
-                        <form v-on:submit.prevent="saveProfile">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <!-- Last Name -->
-                                <div>
-                                    <label class="form-label">Họ</label>
-                                    <input v-model="form.lastName" type="text" class="form-input" placeholder="Nhập họ">
-                                </div>
-                                <!-- First Name -->
-                                <div>
-                                    <label class="form-label">Tên</label>
-                                    <input v-model="form.firstName" type="text" class="form-input" placeholder="Nhập tên">
-                                </div>
+                    <div class="header-info-row">
+                        <div class="avatar-wrapper">
+                            <div v-if="form.avatar">
+                                <img :src="form.avatar" alt="Avatar" class="avatar-img">
                             </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <!-- Phone -->
-                                <div>
-                                    <label class="form-label">Số điện thoại</label>
-                                    <input v-model="form.phone" type="tel" class="form-input" placeholder="09xxxxxxx">
-                                </div>
-                                <!-- Gender -->
-                                <div>
-                                    <label class="form-label">Giới tính</label>
-                                    <select v-model="form.gender" class="form-select">
-                                        <option value="">Chọn giới tính</option>
-                                        <option value="Nam">Nam</option>
-                                        <option value="Nu">Nữ</option>
-                                        <option value="Khac">Khác</option>
-                                    </select>
-                                </div>
+                            <div v-else class="avatar-initials">
+                                {{ getInitials(form.firstName) }}
                             </div>
-
-                            <!-- Email (Read-only usually) -->
-                            <div class="mb-8">
-                                <label class="form-label">Email</label>
-                                <input v-model="form.email" type="email" class="form-input bg-gray-50 text-gray-500 cursor-not-allowed" readonly>
-                                <p class="mt-1 text-xs text-gray-400">Email không thể thay đổi.</p>
-                            </div>
-
-                            <div class="flex justify-end pt-4 border-t border-gray-100">
-                                <button type="submit" :disabled="isLoading" class="btn-save flex items-center">
-                                    <i v-if="isLoading" class="ph-bold ph-spinner animate-spin mr-2"></i>
-                                    {{ isLoading ? 'Đang lưu...' : 'Lưu thay đổi' }}
-                                </button>
-                            </div>
-                        </form>
+                        </div>
+                        <div class="user-info">
+                            <h1 class="user-name">{{ form.lastName }} {{ form.firstName }}</h1>
+                            <p class="user-email-label">{{ form.email }}</p>
+                        </div>
+                        <button v-on:click="saveProfile" :disabled="isLoading" class="btn-edit">
+                            <span v-if="isLoading">Đang lưu...</span>
+                            <span v-else>Lưu thay đổi</span>
+                        </button>
                     </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Họ</label>
+                            <input v-model="form.lastName" type="text" class="form-input" placeholder="Nhập họ">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tên</label>
+                            <input v-model="form.firstName" type="text" class="form-input" placeholder="Nhập tên">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Giới tính</label>
+                            <select v-model="form.gender" class="form-input">
+                                <option value="Nam">Nam</option>
+                                <option value="Nu">Nữ</option>
+                                <option value="Khac">Khác</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Số điện thoại</label>
+                            <input v-model="form.phone" type="text" class="form-input" placeholder="Nhập số điện thoại">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Địa chỉ (Mặc định)</label>
+                            <input v-model="form.address" type="text" class="form-input" placeholder="Nhập địa chỉ giao hàng">
+                        </div>
+                        
+                        <!-- Added Avatar URL Field -->
+                        <div class="form-group">
+                            <label class="form-label">Ảnh đại diện (URL)</label>
+                            <input v-model="form.avatar" type="text" class="form-input" placeholder="Dán link ảnh vào đây (https://...)">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Thành viên từ</label>
+                            <input :value="formatDate(form.createdAt)" type="text" class="form-input" readonly>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <h3 class="email-section-title">Địa chỉ Email của tôi</h3>
+                        <div class="email-card">
+                            <div class="email-icon">
+                                <i class="ph-fill ph-envelope-simple"></i>
+                            </div>
+                            <div class="email-info">
+                                <span class="email-text">{{ form.email }}</span>
+                                <span class="email-meta">Đã xác thực</span>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -104,7 +140,8 @@
                         lastName: serverUser?.lastName || '',
                         email: serverUser?.email || '',
                         phone: serverUser?.phone || '',
-                        gender: serverUser?.gender || '',
+                        gender: serverUser?.gender || 'Nam',
+                        address: serverUser?.defaultAddress?.street || '', 
                         avatar: serverUser?.avatar || '',
                         createdAt: serverUser?.createdAt
                     });
@@ -114,47 +151,35 @@
                         return new Date(dateString).toLocaleDateString('vi-VN');
                     };
 
+                    const getInitials = (firstName) => {
+                        if (!firstName) return "US";
+                        return firstName.substring(0, 2).toUpperCase();
+                    };
+
                     const saveProfile = async () => {
-                        // Basic Validation
-                        if (!form.firstName || !form.lastName || !form.phone) {
-                            if(window.showNotification) 
-                                window.showNotification("Vui lòng nhập đầy đủ thông tin bắt buộc", "warning");
-                            return;
-                        }
-
                         isLoading.value = true;
-
                         try {
                             const response = await fetch('/Account/UpdateProfile', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(form)
                             });
-
                             const data = await response.json();
-
+                            
                             if (data.success) {
-                                if(window.showNotification) 
-                                    window.showNotification("Cập nhật thông tin thành công!", "success");
+                                if(window.showNotification) window.showNotification("Đã lưu thay đổi", "success");
                             } else {
-                                if(window.showNotification) 
-                                    window.showNotification(data.message || "Có lỗi xảy ra", "error");
+                                if(window.showNotification) window.showNotification(data.message, "error");
                             }
-                        } catch (error) {
-                            console.error(error);
-                            if(window.showNotification) 
-                                window.showNotification("Lỗi kết nối server", "error");
+                        } catch (e) {
+                            console.error(e);
+                            if(window.showNotification) window.showNotification("Lỗi kết nối server", "error");
                         } finally {
                             isLoading.value = false;
                         }
                     };
 
-                    return {
-                        form,
-                        isLoading,
-                        formatDate,
-                        saveProfile
-                    };
+                    return { form, isLoading, formatDate, getInitials, saveProfile };
                 }
             });
         }

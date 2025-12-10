@@ -31,7 +31,15 @@
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
         var userName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Khách";
         var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "guest";
-        var avatar = "/images/default-avatar.png"; 
+        
+        // 1. Try to get Avatar from Claims
+        var avatar = User.FindFirst("Avatar")?.Value;
+
+        // 2. Fallback: If empty, use UI Avatars with Initials
+        if (string.IsNullOrEmpty(avatar))
+        {
+            avatar = $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(userName)}&background=f97316&color=fff";
+        }
     }
 
     <script>
@@ -42,22 +50,14 @@
             avatar: @Json.Serialize(avatar)
         };
 
-        // GLOBAL HELPER: Check login status
-        // Now uses the new notification system!
         window.requireLogin = function() {
             if (!window.serverState.isAuthenticated) {
-                // Use the new custom notification instead of alert()
                 if (window.showNotification) {
                     window.showNotification("Vui lòng đăng nhập để thực hiện chức năng này!", "warning");
                 } else {
-                    alert("Vui lòng đăng nhập!"); // Fallback
+                    alert("Vui lòng đăng nhập!"); 
                 }
-                
-                // Optional: Delay redirect slightly so user sees the message
-                setTimeout(() => {
-                    window.location.href = "/Account/Login";
-                }, 1500);
-                
+                setTimeout(() => { window.location.href = "/Account/Login"; }, 1500);
                 return false;
             }
             return true;
@@ -117,7 +117,8 @@
                                         <div class="text-sm font-bold text-gray-700">{{ currentUser.userName }}</div>
                                         <div class="text-xs text-green-600 uppercase">{{ currentUser.role }}</div>
                                     </div>
-                                    <img :src="currentUser.avatar" class="h-9 w-9 rounded-full border-2 border-orange-100 bg-gray-200" alt="Avatar">
+                                    <!-- Use dynamic avatar -->
+                                    <img :src="currentUser.avatar" class="h-9 w-9 rounded-full border-2 border-orange-100 bg-gray-200 object-cover" alt="Avatar">
                                 </div>
                                 
                                 <transition name="fade">
@@ -166,7 +167,6 @@
             </div>
         </nav>
 
-        <!-- ADDED: Global Notification Component -->
         @await Html.PartialAsync("_Notification")
 
         <main class="flex-grow">
@@ -214,3 +214,4 @@
     </script>
 </body>
 </html>
+

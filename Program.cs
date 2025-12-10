@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using ASM.Data;   
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.Swagger;
+using ASM.Data;   
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,10 @@ builder.Services.AddAuthentication(options =>
     facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"] ?? "dummy-secret";
 });
 
+builder.Services.AddSwaggerGen(c => {
+  c.SwaggerDoc("v1", new OpenApiInfo {Title = "My API", Version = "V1"});
+});
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -51,5 +57,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+  c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
 
 app.Run();
