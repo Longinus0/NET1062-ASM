@@ -1,0 +1,63 @@
+You are a Senior Frontend Engineer. Build a Vue 3 (Vite) SPA for an online fast-food ordering system.
+
+Tech constraints:
+- Vue 3 + TypeScript
+- Vue Router
+- Pinia for state management
+- Axios for API calls
+- UI library: PrimeVue (preferred) OR Vuetify (choose one and stay consistent)
+- Form validation: VeeValidate + Yup (or built-in rules if using Vuetify)
+- Styling: clean, modern, professional, responsive (mobile + desktop)
+
+Backend:
+- ASP.NET Core API, Swagger available
+- JWT auth
+- Roles: Guest, Customer, Admin
+- Base API URL: http://localhost:5000/api/v1
+
+App requirements:
+Guest:
+- Browse foods and combos
+- Product/combo detail page
+- Search basic and advanced (name, price range, category/topic/tag)
+Customer:
+- Register and login
+- Manage profile
+- Cart and checkout
+- Order history and order tracking (status timeline)
+Admin:
+- Admin login
+- Admin dashboard
+- CRUD: Users, Products, Combos, Orders
+- Cannot delete current admin (show UI message if attempted)
+Security/UX:
+- Store JWT in memory or localStorage (your call), include refresh-safe pattern
+- Axios interceptor adds Authorization header
+- Router guards for auth + role-based access
+- Show toast notifications on success/error
+- Friendly empty states and error states
+
+Deliverables:
+- Full file structure with code for each file
+- Reusable components (NavBar, Footer, ProductCard, ComboCard, CartDrawer, ConfirmDialog)
+- API service layer with typed DTOs
+- Pinia stores: authStore, catalogStore, cartStore, adminStore
+- Pages:
+  / (home), /menu, /product/:id, /combo/:id, /search
+  /login, /register, /profile, /cart, /checkout, /orders, /orders/:id
+  /admin/login, /admin, /admin/users, /admin/products, /admin/combos, /admin/orders
+
+Implementation details:
+- Use composables for common logic (useAuth, useApi, useToast)
+- Use environment variable VITE_API_BASE_URL
+- Include a simple role badge and user menu dropdown
+- Create a layout system: PublicLayout, CustomerLayout, AdminLayout
+
+Output format:
+1) Show folder tree
+2) Then provide complete code blocks for every file
+3) No placeholders like “TODO” unless absolutely necessary
+4) Ensure the app runs after npm install + npm run dev
+
+Important: do NOT invent endpoints. If an endpoint is unknown, create a typed api method and mark the URL as a configurable constant in apiRoutes.ts. Keep UI functional with mock fallback data only if the API method is not implemented, and clearly separate mock logic.
+

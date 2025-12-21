@@ -1,0 +1,232 @@
+A) Guest features
+1) Register account (≥ 6 fields) 
+
+NET1062 - Assignment
+
+Baseline
+
+Fields (example 6+): FullName, Email, Phone, Password, Address, DateOfBirth (or Gender), CreatedAt.
+
+Password hashing, email uniqueness.
+
+Real-World Enhancement
+
+Email verification (token) OR “verified=false” flag with restricted checkout until verified.
+
+Password policy (min length + complexity) + breach-style check (basic).
+
+Audit trail: capture RegisteredIp, UserAgent.
+
+Anti-bot: rate-limit register endpoint + simple CAPTCHA toggle (even optional).
+
+2) Browse foods + browse combos 
+
+NET1062 - Assignment
+
+Baseline
+
+Categories → Products
+
+Combos → list of items in combo
+
+Real-World Enhancement
+
+Availability + stock: show “Sold out” and prevent checkout.
+
+Dietary tags: spicy/vegan/halal/allergens (small but very realistic).
+
+Sort & filters: “Popular”, “Newest”, “Price low-high”, “Rating”.
+
+3) View product/combo detail 
+
+NET1062 - Assignment
+
+Baseline
+
+Name, description, price, category, image, combo items.
+
+Real-World Enhancement
+
+Smart upsell: “Frequently bought together” (simple rule: same category or top sellers).
+
+View tracking: record product views (for admin analytics).
+
+4) Search basic (by name) 
+
+NET1062 - Assignment
+
+5) Search advanced (name, price, type/category, info, topic) 
+
+NET1062 - Assignment
+
+Baseline
+
+Query parameters: q, minPrice, maxPrice, categoryId, topicTag, sort, page.
+
+Real-World Enhancement
+
+Debounced search + suggestions on Vue side.
+
+Search normalization: remove accents/diacritics for Vietnamese text.
+
+Edge-case handling: invalid ranges (minPrice>maxPrice), empty results UX, pagination.
+
+B) Customer features
+1) Login + optional Google login 
+
+NET1062 - Assignment
+
+Baseline
+
+JWT login for local accounts
+
+Google OAuth login (frontend obtains id_token; backend validates and issues your JWT)
+
+Real-World Enhancement
+
+Refresh tokens (more “real system” feel than only short-lived JWT)
+
+Device sessions: list active sessions, “log out other devices”
+
+2-step optional (even if just a stub toggle)
+
+2) Update personal info 
+
+NET1062 - Assignment
+
+Baseline
+
+Update profile fields; secure by user identity.
+
+Real-World Enhancement
+
+Change password flow (requires old password)
+
+Address book (multiple delivery addresses)
+
+Validation: phone regex, email format, max length, sanitize.
+
+3) Place order & pay 
+
+NET1062 - Assignment
+
+Baseline
+
+Cart → checkout → create Order + OrderItems
+
+Payment method field (Cash, MoMo, VNPay, ZaloPay “simulated” is fine)
+
+Real-World Enhancement
+
+Idempotency key on checkout (prevents double-click double orders)
+
+Order total correctness: store snapshot unit price per item at time of purchase
+
+Promo codes: fixed/percent discount with expiry + usage limit
+
+Order notes: “less ice”, “no onions” (tiny feature, huge realism)
+
+4) View order history via invoices 
+
+NET1062 - Assignment
+
+5) Track order status 
+
+NET1062 - Assignment
+
+Baseline
+
+Order list, details, status (New/Preparing/Delivering/Delivered/Cancelled)
+
+Real-World Enhancement
+
+Status timeline table (OrderStatusHistory) — looks professional
+
+Estimated delivery time (even if rule-based)
+
+Email/notification log (store notifications sent)
+
+C) Admin features
+1) Admin login (management site) 
+
+NET1062 - Assignment
+
+Enhancement
+
+Role-based policies (Admin vs Staff)
+
+Admin-only routes + separate Vue admin layout
+
+2) Admin update profile 
+
+NET1062 - Assignment
+
+Same approach as customer + stronger audit log.
+
+3) Manage users (CRUD) + cannot delete current admin 
+
+NET1062 - Assignment
+
+Real-World Enhancement
+
+Soft delete / lock account instead of hard delete
+
+Force password reset toggle
+
+Audit log of admin actions (who changed what)
+
+4) Manage food items (CRUD) 
+
+NET1062 - Assignment
+
+Enhancement
+
+Draft vs Published (so admin can prepare menu)
+
+Image upload (store URL/path)
+
+Validation: price range, name uniqueness per category
+
+5) Manage combos (CRUD) 
+
+NET1062 - Assignment
+
+Enhancement
+
+Combo pricing rules: fixed price OR % discount vs sum(items)
+
+Prevent combo from containing duplicate items
+
+6) Manage orders (delivered / not / delivering) 
+
+NET1062 - Assignment
+
+Enhancement
+
+Assign “shipper” (admin/staff)
+
+Status change requires reason (for cancellation)
+
+Export CSV (quick extra feature for 100%)
+
+D) Security + API management (explicitly required)
+
+Required: DI, JWT, Rate limiting & throttling, HTTPS, input validation + sanitization, Swagger API docs, upload hosting. 
+
+NET1062 - Assignment
+
+Real-World Enhancement pack (easy marks)
+
+Global exception handling middleware + consistent error format
+
+Request logging (not passwords), correlation id
+
+Versioned API /api/v1/...
+
+Swagger security: “Authorize” button for JWT testing
+
+Rate limits by route (tight on login/register, looser on catalog)
+
+And remember: grading says max score if you add extra functions. 
+
+NET1062 - Assignment

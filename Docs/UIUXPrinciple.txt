@@ -1,0 +1,39 @@
+Role: You are a Senior UI/UX Designer and Frontend Engineer.
+
+Context:
+I am building a Vue 3 web application for an online fast-food ordering system.
+I will provide screenshots/images of my current UI.
+The UI is functional but visually inconsistent and has UX issues.
+
+Task:
+Analyze the provided images carefully and:
+1. Identify UI problems (spacing, alignment, typography, hierarchy, color usage).
+2. Identify UX problems (confusing flows, unclear actions, poor feedback, accessibility issues).
+3. Propose concrete improvements while KEEPING the existing layout structure where possible.
+4. Improve clarity, consistency, and usability without over-engineering.
+
+Constraints:
+- Do NOT redesign from scratch.
+- Do NOT introduce new features unless necessary for UX clarity.
+- Keep changes incremental and realistic for a student project.
+- Assume Vue 3 + component-based architecture.
+- Assume a UI library is already in use (PrimeVue or Vuetify).
+- Assume backend logic already works — focus ONLY on UI/UX.
+
+Deliverables:
+For each provided image:
+- Section A: What works well (brief).
+- Section B: UI issues (visual/design).
+- Section C: UX issues (interaction/flow).
+- Section D: Specific improvement suggestions.
+- Section E: Component-level recommendations (what to change in code, e.g., spacing, component choice, button placement).
+
+Output style:
+- Clear bullet points
+- Practical suggestions a developer can apply immediately
+- No vague design buzzwords
+- No code unless necessary (describe changes first)
+
+Goal:
+Make the UI look clean, consistent, and professional enough for a university high-distinction project.
+
